@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Worker Details - Kibaru</title>
+    <script src="https://cdn.tailwindcss.com"></script> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 smooth-transition">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50 dark:bg-gray-800">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-home text-blue-500 text-2xl"></i>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800 dark:text-white">Kibaru</h1>
+                    <p class="text-xs text-gray-600 dark:text-gray-300">Kibarua kwa wote</p>
+                </div>
+            </div>
+            <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700">
+                <i class="fas fa-moon text-gray-600 dark:text-yellow-300"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Worker Detail Section -->
+    <section class="py-12 container mx-auto px-4">
+        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden dark:bg-gray-800">
+            <div class="relative">
+                <img id="workerImage" src="" alt="Worker Image" class="w-full h-64 object-cover">
+                <div class="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-full">
+                    <i class="fas fa-check-circle mr-1"></i> Verified
+                </div>
+            </div>
+            <div class="p-6">
+                <h2 id="workerName" class="text-2xl font-bold mb-2 dark:text-white">Worker Name</h2>
+                <p id="workerService" class="text-gray-600 dark:text-gray-300 mb-4">Service</p>
+
+                <div class="flex items-center mb-6">
+                    <div class="flex text-yellow-500">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <span id="workerRating" class="ml-2 text-gray-600 dark:text-gray-300">(4.9)</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="font-semibold mb-2 dark:text-white">About Me</h3>
+                        <p class="text-gray-600 dark:text-gray-300">
+                            I'm a licensed and experienced professional with over 10 years in the field.
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold mb-2 dark:text-white">Location</h3>
+                        <p class="text-gray-600 dark:text-gray-300" id="workerLocation">Location</p>
+
+                        <h3 class="font-semibold mt-4 mb-2 dark:text-white">Hourly Rate</h3>
+                        <p class="text-blue-500 font-bold" id="workerRate">Hourly Rate</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex justify-between">
+                    <button class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600">Book Now</button>
+                    <button class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600">Chat</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; 2023 Kibaru. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="worker.js"></script>
+</body>
+</html>

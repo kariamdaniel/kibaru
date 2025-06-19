@@ -1,19 +1,29 @@
+/* Service Card Hover */
 .service-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
-.worker-card:hover {
-    transform: scale(1.02);
+/* Worker Card Hover & Click Support */
+.worker-card {
+    position: relative;
+    z-index: 1;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+.worker-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Mode Styles */
 .dark-mode {
-    background-color: #1a202c;
+    background-color: #040b18;
     color: #f7fafc;
 }
 
 .dark-mode .dark\:bg-gray-800 {
-    background-color: #2d3748;
+    background-color: #060c16;
 }
 
 .dark-mode .dark\:text-white {
@@ -24,10 +34,12 @@
     border-color: #4a5568;
 }
 
+/* Smooth Transitions */
 .smooth-transition {
     transition: all 0.3s ease;
 }
 
+/* Chat Container (Hidden by Default) */
 #chat-container {
     position: fixed;
     bottom: -400px; /* Hidden below screen */
@@ -35,12 +47,37 @@
     width: 320px;
     max-width: 90vw;
     z-index: 1000;
-
-    transform: translateY(100%) !important;
-    transition: transform 0.3s ease !important;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
 }
 
 #chat-container.open {
-    transform: translateY(0) !important;
+    transform: translateY(0);
+    bottom: 90px;
 }
+
+/* Worker Card Full Click Area Support */
+.worker-card a {
+    display: block;
+    position: relative;
+    z-index: 0;
+    text-decoration: none;
+    color: inherit;
+}
+
+.worker-card button {
+    position: relative;
+    z-index: 2;
+}
+/* === Base Utility Classes === */
+
+/* Smooth transitions */
+.smooth-transition {
+    transition: all 0.3s ease;
+}
+
+/* Hover effects */
+.hover\:shadow-lg:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+                0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
