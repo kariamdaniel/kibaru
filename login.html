@@ -1,0 +1,38 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Kibaru</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script> 
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script> 
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script> 
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 p-8">
+    <div class="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 rounded shadow">
+        <h2 class="text-2xl font-bold mb-4">Login to Kibaru</h2>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="Email" class="w-full p-2 mb-4 border rounded" required>
+            <input type="password" id="password" placeholder="Password" class="w-full p-2 mb-4 border rounded" required>
+            
+            <!-- Role Selection -->
+            <label for="role" class="block mb-2">I am a:</label>
+            <select id="role" class="w-full p-2 mb-4 border rounded" required>
+                <option value="">-- Select Role --</option>
+                <option value="household">Household</option>
+                <option value="worker">Worker</option>
+            </select>
+            
+            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">
+                Login
+            </button>
+        </form>
+        <p class="mt-4 text-center">
+            Don't have an account? <a href="register.html" class="text-blue-500">Register</a>
+        </p>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

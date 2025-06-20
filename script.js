@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (darkModeToggle) {
         darkModeToggle.addEventListener('click', () => {
             body.classList.toggle('dark-mode');
-
             const icon = darkModeToggle.querySelector('i');
+
             if (body.classList.contains('dark-mode')) {
                 icon?.classList.replace('fa-moon', 'fa-sun');
                 localStorage.setItem('darkMode', 'enabled');
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Load saved dark mode preference
+        // Load Saved Dark Mode
         if (localStorage.getItem('darkMode') === 'enabled') {
             body.classList.add('dark-mode');
             const icon = darkModeToggle.querySelector('i');
@@ -40,105 +40,85 @@ document.addEventListener('DOMContentLoaded', () => {
             chatContainer.classList.toggle('open');
         });
 
-        // Close chat with close button
-        closeChat.addEventListener('click', () => {
+        // Close chat with X
+        closeChat.addEventListener('click', (e) => {
+            e.stopPropagation();
             chatContainer.classList.remove('open');
         });
 
-        // ✅ Close chat when clicking outside (inside chat-container)
+        // Close chat on ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                chatContainer.classList.remove('open');
+            }
+        });
+
+        // Click outside to close chat
         chatContainer.addEventListener('click', (e) => {
             if (e.target === chatContainer) {
                 chatContainer.classList.remove('open');
             }
         });
-
-        // ✅ Close chat with ESC key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                chatContainer.classList.remove('open');
-            }
-        });
+    } else {
+        console.warn("Chat elements missing:", { chatButton, chatContainer, closeChat });
     }
 
     // =============
-    // Worker Card Modal (Click to Show)
+    // Worker Card Modal
     // =============
-    const workerCards = document.querySelectorAll('.worker-card');
     const workerModal = document.getElementById('workerModal');
     const closeModalBtn = document.getElementById('closeModal');
 
-    if (workerCards.length > 0 && workerModal && closeModalBtn) {
-        workerCards.forEach(card => {
-            card.addEventListener('click', () => {
-                // Extract data from data-* attributes
-                const name = card.getAttribute('data-name') || 'N/A';
-                const service = card.getAttribute('data-service') || 'N/A';
-                const location = card.getAttribute('data-location') || 'N/A';
-                const rate = card.getAttribute('data-rate') || 'N/A';
-                const rating = card.getAttribute('data-rating') || 'N/A';
+    function showWorkerModal(event, element) {
+        event.preventDefault();
 
-                // Extract availability from second <p> tag
-                const availability = card.querySelectorAll('p')[1]?.textContent.trim() || 'Not available';
+        const card = element.querySelector(".worker-card");
+        const name = card.getAttribute("data-name") || "N/A";
+        const service = card.getAttribute("data-service") || "N/A";
+        const location = card.getAttribute("data-location") || "N/A";
+        const rating = card.getAttribute("data-rating") || "N/A";
+        const rate = card.getAttribute("data-rate") || "N/A";
 
-                // Populate modal
-                document.getElementById('modalWorkerName').textContent = name;
-                document.getElementById('modalWorkerService').textContent = service;
-                document.getElementById('modalWorkerLocation').textContent = location;
-                document.getElementById('modalWorkerAvailability').textContent = availability;
-                document.getElementById('modalWorkerRating').textContent = `${rating} ★`;
-                document.getElementById('modalWorkerRate').textContent = rate;
+        document.getElementById("modalWorkerName").textContent = name;
+        document.getElementById("modalWorkerService").textContent = service;
+        document.getElementById("modalWorkerLocation").textContent = location;
+        document.getElementById("modalWorkerRating").textContent = `${rating} ★`;
+        document.getElementById("modalWorkerRate").textContent = rate;
+        document.getElementById("workerModal").classList.remove("hidden");
+    }
 
-                // Show modal
-                workerModal.classList.remove('hidden');
-            });
+    if (workerModal && closeModalBtn) {
+        // Close modal on X
+        closeModalBtn.addEventListener("click", () => {
+            workerModal.classList.add("hidden");
         });
 
-        // Close modal on close button
-        closeModalBtn.addEventListener('click', () => {
-            workerModal.classList.add('hidden');
-        });
-
-        // Close modal when clicking outside
-        workerModal.addEventListener('click', (e) => {
+        // Close modal on outside click
+        workerModal.addEventListener("click", (e) => {
             if (e.target === workerModal) {
-                workerModal.classList.add('hidden');
+                workerModal.classList.add("hidden");
             }
         });
 
-        // ESC key to close modal
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                workerModal.classList.add('hidden');
-                chatContainer?.classList.remove('open'); // Close chat too if needed
+        // ESC key closes modal
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && !workerModal.classList.contains("hidden")) {
+                workerModal.classList.add("hidden");
             }
         });
+    } else {
+        console.warn("Worker modal or close button missing");
     }
 
     // =============
-    // Hover Effects
+    // Logout Button
     // =============
-    const serviceCards = document.querySelectorAll('.service-card');
-    const workerCardsHover = document.querySelectorAll('.worker-card');
-
-    serviceCards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-5px)';
-            card.style.boxShadow = '0 10px 25px -5px rgba(0, 0, 0, 0.1)';
-        });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-            card.style.boxShadow = '';
-        });
-    });
-
-    workerCardsHover.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-5px)';
-            card.style.boxShadow = '0 20px 30px rgba(0, 0, 0, 0.15)';
-        });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-            card.style.boxShadow = '';
+    const logoutBtn = document.getElementById("logoutBtn");
+    logoutBtn?.addEventListener("click", () => {
+        firebase.auth().signOut().then(() => {
+            window.location.href = "login.html"; // Redirect to login after logout
+        }).catch((error) => {
+            console.error("Logout failed:", error.message);
         });
     });
 });
