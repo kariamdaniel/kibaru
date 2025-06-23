@@ -1,325 +1,325 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worker Dashboard - Kibaru</title>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Worker Dashboard - Kibaru</title>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script> 
+        <!-- Tailwind CSS -->
+        <script src="https://cdn.tailwindcss.com"></script> 
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
+        <!-- Font Awesome -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> 
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script> 
+        <!-- Firebase SDKs -->
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script> 
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script> 
+        <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script> 
 
-    <!-- Styles -->
-    <style>
-        .chat-message.worker {
-            background-color: #bfdbfe;
-            margin-left: auto;
-        }
-        .chat-message.customer {
-            background-color: #f1f5f9;
-            margin-right: auto;
-        }
-    </style>
-</head>
-<body class="bg-gray-50 dark:bg-gray-900 p-4 md:p-6 font-sans">
-
-    <!-- Header -->
-    <header class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-blue-600">Worker Dashboard</h1>
-            <p class="text-sm text-gray-600 dark:text-gray-400">Kibarua kwa wote</p>
-        </div>
-        <div class="flex items-center gap-4">
-            <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                <i class="fas fa-moon dark:hidden"></i>
-                <i class="fas fa-sun hidden dark:block"></i>
-            </button>
-            <button id="logoutBtn" class="text-red-500 hover:text-red-600 font-semibold">Logout</button>
-        </div>
-    </header>
-
-    <!-- Worker Profile -->
-    <section class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6">
-        <h2 class="text-xl md:text-2xl font-bold mb-4">Your Profile</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block mb-2 font-medium">Full Name</label>
-                <input type="text" id="workerName" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" disabled>
-            </div>
-            <div>
-                <label class="block mb-2 font-medium">Service</label>
-                <input type="text" id="workerService" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" disabled>
-            </div>
-            <div>
-                <label class="block mb-2 font-medium">Location</label>
-                <input type="text" id="workerLocation" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" disabled>
-            </div>
-            <div>
-                <label class="block mb-2 font-medium">Hourly Rate</label>
-                <input type="text" id="workerRate" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" disabled>
-            </div>
-        </div>
-
-        <!-- Availability Toggle -->
-        <div class="mt-6">
-            <label class="inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="availabilityToggle" class="sr-only peer">
-                <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600"></div>
-                <span class="ms-3 text-sm font-medium text-gray-700 dark:text-gray-300">Available for Jobs</span>
-            </label>
-        </div>
-    </section>
-
-    <!-- Job Requests -->
-    <section class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6">
-        <h2 class="text-xl md:text-2xl font-bold mb-4">Job Requests</h2>
-        <div id="jobList" class="space-y-4 max-h-96 overflow-y-auto">
-            <!-- Job cards will be populated here -->
-        </div>
-    </section>
-
-    <!-- Chat & Messages -->
-    <section class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6">
-        <h2 class="text-xl md:text-2xl font-bold mb-4">Messages</h2>
-        
-        <!-- Customer Selector -->
-        <div class="mb-4">
-            <label class="block mb-2 text-sm font-medium">Select Customer</label>
-            <select id="customerSelector" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
-                <option value="">-- Select Customer --</option>
-            </select>
-        </div>
-
-        <!-- Chat Box -->
-        <div class="mb-4 h-64 overflow-y-auto bg-gray-100 p-4 rounded dark:bg-gray-700">
-            <div id="chatBox" class="space-y-2"></div>
-        </div>
-
-        <!-- Chat Input -->
-        <div class="flex">
-            <input type="text" id="chatInput" placeholder="Type a message..." class="flex-1 p-2 border rounded-l dark:bg-gray-700 dark:border-gray-600">
-            <button id="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
-    </section>
-
-    <!-- Job History -->
-    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6">
-        <h2 class="text-xl md:text-2xl font-bold mb-4">Job History</h2>
-        <div id="jobHistoryList" class="space-y-4 max-h-96 overflow-y-auto">
-            <!-- Job history will be loaded here -->
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="mt-8 text-center text-gray-500 dark:text-gray-400">
-        <p>&copy; 2023 Kibaru. All rights reserved.</p>
-    </footer>
-
-    <!-- Firebase Config -->
-    <script>
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-    </script>
-
-    <!-- Worker Dashboard Logic -->
-    <script>
-        // Dark Mode Toggle
-        const darkModeToggle = document.getElementById("darkModeToggle");
-        const body = document.body;
-
-        if (localStorage.getItem("darkMode") === "enabled") {
-            body.classList.add("dark");
-            darkModeToggle.querySelector(".fas.fa-moon")?.classList.add("hidden");
-            darkModeToggle.querySelector(".fas.fa-sun")?.classList.remove("hidden");
-        }
-
-        darkModeToggle.addEventListener("click", () => {
-            body.classList.toggle("dark");
-            const iconMoon = darkModeToggle.querySelector(".fas.fa-moon");
-            const iconSun = darkModeToggle.querySelector(".fas.fa-sun");
-
-            if (body.classList.contains("dark")) {
-                localStorage.setItem("darkMode", "enabled");
-                iconMoon?.classList.add("hidden");
-                iconSun?.classList.remove("hidden");
-            } else {
-                localStorage.removeItem("darkMode");
-                iconMoon?.classList.remove("hidden");
-                iconSun?.classList.add("hidden");
+        <!-- Styles -->
+        <style>
+            .chat-message.worker {
+                background-color: #bfdbfe;
+                margin-left: auto;
             }
-        });
+            .chat-message.customer {
+                background-color: #f1f5f9;
+                margin-right: auto;
+            }
+        </style>
+    </head>
+    <body class="bg-gray-50 dark:bg-gray-900 p-4 md:p-6 font-sans">
 
-        // Auth Check
-        auth.onAuthStateChanged(user => {
-            if (!user) {
-                window.location.href = "login.html";
-                return;
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-blue-600">Worker Dashboard</h1>
+                <p class="text-sm text-gray-600 dark:text-gray-400">Kibarua kwa wote</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <button id="darkModeToggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                    <i class="fas fa-moon dark:hidden"></i>
+                    <i class="fas fa-sun hidden dark:block"></i>
+                </button>
+                <button id="logoutBtn" class="text-red-500 hover:text-red-600 font-semibold">Logout</button>
+            </div>
+        </header>
+
+        <!-- Worker Profile -->
+        <section class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6">
+            <h2 class="text-xl md:text-2xl font-bold mb-4">Your Profile</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-2 font-medium">Full Name</label>
+                    <input type="text" id="workerName" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" disabled>
+                </div>
+                <div>
+                    <label class="block mb-2 font-medium">Service</label>
+                    <input type="text" id="workerService" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" disabled>
+                </div>
+                <div>
+                    <label class="block mb-2 font-medium">Location</label>
+                    <input type="text" id="workerLocation" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" disabled>
+                </div>
+                <div>
+                    <label class="block mb-2 font-medium">Hourly Rate</label>
+                    <input type="text" id="workerRate" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" disabled>
+                </div>
+            </div>
+
+            <!-- Availability Toggle -->
+            <div class="mt-6">
+                <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="availabilityToggle" class="sr-only peer">
+                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:bg-blue-600"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-700 dark:text-gray-300">Available for Jobs</span>
+                </label>
+            </div>
+        </section>
+
+        <!-- Job Requests -->
+        <section class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6">
+            <h2 class="text-xl md:text-2xl font-bold mb-4">Job Requests</h2>
+            <div id="jobList" class="space-y-4 max-h-96 overflow-y-auto">
+                <!-- Job cards will be populated here -->
+            </div>
+        </section>
+
+        <!-- Chat & Messages -->
+        <section class="mb-8 bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6">
+            <h2 class="text-xl md:text-2xl font-bold mb-4">Messages</h2>
+            
+            <!-- Customer Selector -->
+            <div class="mb-4">
+                <label class="block mb-2 text-sm font-medium">Select Customer</label>
+                <select id="customerSelector" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600">
+                    <option value="">-- Select Customer --</option>
+                </select>
+            </div>
+
+            <!-- Chat Box -->
+            <div class="mb-4 h-64 overflow-y-auto bg-gray-100 p-4 rounded dark:bg-gray-700">
+                <div id="chatBox" class="space-y-2"></div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="flex">
+                <input type="text" id="chatInput" placeholder="Type a message..." class="flex-1 p-2 border rounded-l dark:bg-gray-700 dark:border-gray-600">
+                <button id="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- Job History -->
+        <section class="bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 md:p-6">
+            <h2 class="text-xl md:text-2xl font-bold mb-4">Job History</h2>
+            <div id="jobHistoryList" class="space-y-4 max-h-96 overflow-y-auto">
+                <!-- Job history will be loaded here -->
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-8 text-center text-gray-500 dark:text-gray-400">
+            <p>&copy; 2023 Kibaru. All rights reserved.</p>
+        </footer>
+
+        <!-- Firebase Config -->
+        <script>
+            const firebaseConfig = {
+                apiKey: "YOUR_API_KEY",
+                authDomain: "YOUR_PROJECT.firebaseapp.com",
+                projectId: "YOUR_PROJECT_ID"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.firestore();
+            const auth = firebase.auth();
+        </script>
+
+        <!-- Worker Dashboard Logic -->
+        <script>
+            // Dark Mode Toggle
+            const darkModeToggle = document.getElementById("darkModeToggle");
+            const body = document.body;
+
+            if (localStorage.getItem("darkMode") === "enabled") {
+                body.classList.add("dark");
+                darkModeToggle.querySelector(".fas.fa-moon")?.classList.add("hidden");
+                darkModeToggle.querySelector(".fas.fa-sun")?.classList.remove("hidden");
             }
 
-            const userId = user.uid;
+            darkModeToggle.addEventListener("click", () => {
+                body.classList.toggle("dark");
+                const iconMoon = darkModeToggle.querySelector(".fas.fa-moon");
+                const iconSun = darkModeToggle.querySelector(".fas.fa-sun");
 
-            // Load Worker Profile
-            db.collection("workers").doc(userId).get().then(doc => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    document.getElementById("workerName").value = data.name || "Unknown";
-                    document.getElementById("workerService").value = data.service || "N/A";
-                    document.getElementById("workerLocation").value = data.location || "N/A";
-                    document.getElementById("workerRate").value = data.rate || "N/A";
-
-                    // Set availability
-                    document.getElementById("availabilityToggle").checked = data.available || false;
-                }
-            }).catch(err => {
-                console.error("Failed to load profile:", err.message);
-            });
-
-            // Availability Toggle
-            document.getElementById("availabilityToggle").addEventListener("change", (e) => {
-                db.collection("workers").doc(userId).update({
-                    available: e.target.checked
-                });
-            });
-
-            // Load Job Requests
-            db.collection("bookings")
-                .where("workerId", "==", userId)
-                .where("status", "==", "pending")
-                .onSnapshot(snapshot => {
-                    let jobs = "";
-                    snapshot.forEach(doc => {
-                        const booking = doc.data();
-                        jobs += `
-                            <div class="bg-blue-50 p-4 rounded-lg shadow dark:bg-gray-700">
-                                <p><strong>Customer:</strong> ${booking.customerName}</p>
-                                <p><strong>Service:</strong> ${booking.service}</p>
-                                <p><strong>Date:</strong> ${new Date(booking.date.seconds * 1000).toLocaleString()}</p>
-                                <div class="mt-4 flex gap-2">
-                                    <button data-id="${doc.id}" class="accept-job bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                                        Accept
-                                    </button>
-                                    <button data-id="${doc.id}" class="decline-job bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                                        Decline
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    document.getElementById("jobList").innerHTML = jobs || "<p>No pending jobs.</p>";
-                });
-
-            // Accept/Decline Job
-            document.getElementById("jobList").addEventListener("click", (e) => {
-                if (e.target.classList.contains("accept-job")) {
-                    const jobId = e.target.dataset.id;
-                    db.collection("bookings").doc(jobId).update({ status: "confirmed" });
-                } else if (e.target.classList.contains("decline-job")) {
-                    const jobId = e.target.dataset.id;
-                    db.collection("bookings").doc(jobId).delete();
+                if (body.classList.contains("dark")) {
+                    localStorage.setItem("darkMode", "enabled");
+                    iconMoon?.classList.add("hidden");
+                    iconSun?.classList.remove("hidden");
+                } else {
+                    localStorage.removeItem("darkMode");
+                    iconMoon?.classList.remove("hidden");
+                    iconSun?.classList.add("hidden");
                 }
             });
 
-            // Load Job History
-            db.collection("bookings")
-                .where("workerId", "==", userId)
-                .where("status", "in", ["confirmed", "completed"])
-                .onSnapshot(snapshot => {
-                    let history = "";
-                    snapshot.forEach(doc => {
-                        const job = doc.data();
-                        history += `
-                            <div class="bg-blue-50 p-4 rounded-lg shadow dark:bg-gray-700">
-                                <p><strong>Customer:</strong> ${job.customerName}</p>
-                                <p><strong>Service:</strong> ${job.service}</p>
-                                <p><strong>Status:</strong> ${job.status}</p>
-                            </div>
-                        `;
-                    });
-                    document.getElementById("jobHistoryList").innerHTML = history || "<p>No job history.</p>";
-                });
+            // Auth Check
+            auth.onAuthStateChanged(user => {
+                if (!user) {
+                    window.location.href = "login.html";
+                    return;
+                }
 
-            // Chat with Customers
-            const customerSelector = document.getElementById("customerSelector");
-            const chatInput = document.getElementById("chatInput");
-            const chatBox = document.getElementById("chatBox");
+                const userId = user.uid;
 
-            // Load customers who booked this worker
-            db.collection("bookings")
-                .where("workerId", "==", userId)
-                .where("status", "in", ["confirmed", "completed"])
-                .onSnapshot(snapshot => {
-                    const customers = new Set();
-                    snapshot.forEach(doc => {
+                // Load Worker Profile
+                db.collection("workers").doc(userId).get().then(doc => {
+                    if (doc.exists) {
                         const data = doc.data();
-                        if (data.customerName && data.customerId) {
-                            customers.add(`${data.customerId}:${data.customerName}`);
-                        }
-                    });
+                        document.getElementById("workerName").value = data.name || "Unknown";
+                        document.getElementById("workerService").value = data.service || "N/A";
+                        document.getElementById("workerLocation").value = data.location || "N/A";
+                        document.getElementById("workerRate").value = data.rate || "N/A";
 
-                    customerSelector.innerHTML = `<option value="">-- Select Customer --</option>`;
-                    customers.forEach(customer => {
-                        const [id, name] = customer.split(":");
-                        const option = document.createElement("option");
-                        option.value = id;
-                        option.textContent = name;
-                        customerSelector.appendChild(option);
+                        // Set availability
+                        document.getElementById("availabilityToggle").checked = data.available || false;
+                    }
+                }).catch(err => {
+                    console.error("Failed to load profile:", err.message);
+                });
+
+                // Availability Toggle
+                document.getElementById("availabilityToggle").addEventListener("change", (e) => {
+                    db.collection("workers").doc(userId).update({
+                        available: e.target.checked
                     });
                 });
 
-            // Send Message
-            document.getElementById("sendMessage").addEventListener("click", () => {
-                const receiverId = customerSelector.value;
-                const text = chatInput.value.trim();
-                if (!receiverId || !text) return;
+                // Load Job Requests
+                db.collection("bookings")
+                    .where("workerId", "==", userId)
+                    .where("status", "==", "pending")
+                    .onSnapshot(snapshot => {
+                        let jobs = "";
+                        snapshot.forEach(doc => {
+                            const booking = doc.data();
+                            jobs += `
+                                <div class="bg-blue-50 p-4 rounded-lg shadow dark:bg-gray-700">
+                                    <p><strong>Customer:</strong> ${booking.customerName}</p>
+                                    <p><strong>Service:</strong> ${booking.service}</p>
+                                    <p><strong>Date:</strong> ${new Date(booking.date.seconds * 1000).toLocaleString()}</p>
+                                    <div class="mt-4 flex gap-2">
+                                        <button data-id="${doc.id}" class="accept-job bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                            Accept
+                                        </button>
+                                        <button data-id="${doc.id}" class="decline-job bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                                            Decline
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        document.getElementById("jobList").innerHTML = jobs || "<p>No pending jobs.</p>";
+                    });
 
-                db.collection("messages").add({
-                    senderId: userId,
-                    receiverId: receiverId,
-                    text: text,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    read: false
+                // Accept/Decline Job
+                document.getElementById("jobList").addEventListener("click", (e) => {
+                    if (e.target.classList.contains("accept-job")) {
+                        const jobId = e.target.dataset.id;
+                        db.collection("bookings").doc(jobId).update({ status: "confirmed" });
+                    } else if (e.target.classList.contains("decline-job")) {
+                        const jobId = e.target.dataset.id;
+                        db.collection("bookings").doc(jobId).delete();
+                    }
                 });
-                chatInput.value = "";
+
+                // Load Job History
+                db.collection("bookings")
+                    .where("workerId", "==", userId)
+                    .where("status", "in", ["confirmed", "completed"])
+                    .onSnapshot(snapshot => {
+                        let history = "";
+                        snapshot.forEach(doc => {
+                            const job = doc.data();
+                            history += `
+                                <div class="bg-blue-50 p-4 rounded-lg shadow dark:bg-gray-700">
+                                    <p><strong>Customer:</strong> ${job.customerName}</p>
+                                    <p><strong>Service:</strong> ${job.service}</p>
+                                    <p><strong>Status:</strong> ${job.status}</p>
+                                </div>
+                            `;
+                        });
+                        document.getElementById("jobHistoryList").innerHTML = history || "<p>No job history.</p>";
+                    });
+
+                // Chat with Customers
+                const customerSelector = document.getElementById("customerSelector");
+                const chatInput = document.getElementById("chatInput");
+                const chatBox = document.getElementById("chatBox");
+
+                // Load customers who booked this worker
+                db.collection("bookings")
+                    .where("workerId", "==", userId)
+                    .where("status", "in", ["confirmed", "completed"])
+                    .onSnapshot(snapshot => {
+                        const customers = new Set();
+                        snapshot.forEach(doc => {
+                            const data = doc.data();
+                            if (data.customerName && data.customerId) {
+                                customers.add(`${data.customerId}:${data.customerName}`);
+                            }
+                        });
+
+                        customerSelector.innerHTML = `<option value="">-- Select Customer --</option>`;
+                        customers.forEach(customer => {
+                            const [id, name] = customer.split(":");
+                            const option = document.createElement("option");
+                            option.value = id;
+                            option.textContent = name;
+                            customerSelector.appendChild(option);
+                        });
+                    });
+
+                // Send Message
+                document.getElementById("sendMessage").addEventListener("click", () => {
+                    const receiverId = customerSelector.value;
+                    const text = chatInput.value.trim();
+                    if (!receiverId || !text) return;
+
+                    db.collection("messages").add({
+                        senderId: userId,
+                        receiverId: receiverId,
+                        text: text,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        read: false
+                    });
+                    chatInput.value = "";
+                });
+
+                // Load Messages
+                db.collection("messages")
+                    .where("receiverId", "==", userId)
+                    .onSnapshot(snapshot => {
+                        snapshot.docChanges().forEach(change => {
+                            if (change.type === "added") {
+                                const msg = change.doc.data();
+                                const messageHTML = `
+                                    <div class="chat-message worker p-2 mb-2 rounded max-w-xs ml-auto dark:bg-blue-900">
+                                        <p class="text-sm">${msg.text}</p>
+                                    </div>`;
+                                chatBox.innerHTML += messageHTML;
+                            }
+                        });
+                    });
+
+                // Logout
+                document.getElementById("logoutBtn").addEventListener("click", () => {
+                    auth.signOut();
+                    window.location.href = "login.html";
+                });
             });
-
-            // Load Messages
-            db.collection("messages")
-                .where("receiverId", "==", userId)
-                .onSnapshot(snapshot => {
-                    snapshot.docChanges().forEach(change => {
-                        if (change.type === "added") {
-                            const msg = change.doc.data();
-                            const messageHTML = `
-                                <div class="chat-message worker p-2 mb-2 rounded max-w-xs ml-auto dark:bg-blue-900">
-                                    <p class="text-sm">${msg.text}</p>
-                                </div>`;
-                            chatBox.innerHTML += messageHTML;
-                        }
-                    });
-                });
-
-            // Logout
-            document.getElementById("logoutBtn").addEventListener("click", () => {
-                auth.signOut();
-                window.location.href = "login.html";
-            });
-        });
-    </script>
-</body>
-</html>
+        </script>
+    </body>
+    </html>
